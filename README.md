@@ -7,7 +7,7 @@ CarParkSolution is an OutSystems 11 web application for exploring Singapore car 
 | Item | Details |
 | --- | --- |
 | Live application | Add the published `CarPark` URL before submission. |
-| OutSystems environment | Add the environment hostname and reviewer access instructions. Send any credentials separately. |
+| OutSystems environment | Environment URL: https://hariharan-chandrasekaran.outsystemscloud.com/CarPark/  |
 | Solution export | `CarParkSolution` V1. The source Platform Server version recorded in the export is `11.42.1.47790`. [Download the OSP](outsystems/application-export/CarParkSolution-v1.osp) |
 | Data source | Singapore Government open data portal. Add the exact dataset title, dataset URL, and consumed REST endpoint from `DataGov_IS`. [data.gov.sg](https://data.gov.sg/) |
 
@@ -60,8 +60,15 @@ These checks cover archive integrity, the solution manifest, and the presence of
 
 The repository currently contains the AWS scope and deployment notes. Add the actual Infrastructure as Code and record whether it was validated, planned, or applied. Record the hosting location of the live OutSystems demo separately. [AWS infrastructure notes](infrastructure/README.md)
 
-## Before submission
-
-- Replace the access and dataset entries above with the verified values. Check the live application URL as a reviewer and grant the requested OutSystems environment access.
-- Commit the AWS IaC and runnable application-level tests. Include the validation commands and actual results.
-- Grant the reviewer access to the Git repository and include its URL with the application submission.
+### Scalability for the next phase
+The diagram shows the MVP modules (solid) and the planned modules (dashed). The layering
+lets the future modules be added without changing the MVP modules:
+- **CPA_Admin** can be added in the end-user layer. It consumes existing Core services
+  (CPA_CS, CPA_Sync_CS, Audits_CS) and needs no changes to CPA_Public.
+- **CPA_Widgets** can take UI blocks out of CPA_Public so Public and Admin share them.
+- **Security_Lib, Logger_Lib and Identity_IS** can be added in the foundation layer.
+  Core and end-user modules adopt them when required, with no rework of the integrations.
+- A new data source (for example a motorcycle or private carpark feed) is a new
+  `*_IS` module plus a new sync in CPA_Sync_CS. The CPA_Public screens keep reading from CPA_CS.
+- Each layer can be deployed and scaled independently through LifeTime, and Core
+  services can be exposed as REST APIs for other channels such as a mobile app.
